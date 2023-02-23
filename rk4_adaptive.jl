@@ -1,27 +1,32 @@
+module rk4
 # RK4 method with adaptive time step control
-function rk4_adaptive(f, t0, tf, x0, er_tol)
-    #f is function to be integrated/derivative: f(t,x)
-    #er_tol is tolerance for error for adaptive time step control
-    t = t0
-    x = x0
+function rk4_adaptive(f, t0, tf, y0, tol, mu=nothing)
+    t = [t0]
+    y = [y0]
     h = (tf - t0) / 100 # initial time step size
-    while t < tf
-        k1 = h * f(t, x)
-        k2 = h * f(t + h/2, x + k1/2)
-        k3 = h * f(t + h/2, x + k2/2)
-        k4 = h * f(t + h, x + k3)
-        x1 = x + (k1 + 2*k2 + 2*k3 + k4)/6
-        k1 = h * f(t+h, x1)
-        k2 = h * f(t + h/2, x1 + k1/2)
-        k3 = h * f(t + h/2, x1 + k2/2)
-        k4 = h * f(t + h, x1 + k3)
-        x2 = x + (k1 + 2*k2 + 2*k3 + k4)/6
-        err = norm(x2 - x1) # error estimate
-        if err < er_tol
-            t += h
-            x = x2
+    while t[end] < tf
+        k1 = h * f(t[end], y[end], mu)
+        k2 = h * f(t[end] + h/2, y[end] + k1/2, mu)
+        k3 = h * f(t[end] + h/2, y[end] + k2/2, mu)
+        k4 = h * f(t[end] + h, y[end] + k3, mu)
+        y1 = y[end] + (k1 + 2*k2 + 2*k3 + k4)/6
+        k1 = h * f(t[end] + h, y1, mu)
+        k2 = h * f(t[end] + h/2, y1 + k1/2, mu)
+        k3 = h * f(t[end] + h/2, y1 + k2/2, mu)
+        k4 = h * f(t[end] + h, y1 + k3, mu)
+        y2 = y[end] + (k1 + 2*k2 + 2*k3 + k4)/6
+        err = norm(y2 - y1) # error estimate
+        if err < tol
+            t_new = t[end] + h
+            y_new = y2
+            push!(t, t_new)
+            push!(y, y_new)
         end
-        h = 0.8 * h * (er_tol/err)^(1/5) # adjust time step size
+        h = 0.8 * h * (tol/err)^(1/5) # adjust time step size
     end
-    return x
+    return t, y
+end
+
+
+
 end
