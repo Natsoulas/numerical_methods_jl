@@ -17,20 +17,20 @@ function VanDerPol(t,Y,μ)
     Ydot = [Ydot_1; Ydot_2]
     return Ydot
 end    
-μ = 1.0
+μ = 10
 #stiff is when it has a high mu value
 y0 = [2.0; 0.0]
 tol = 1.0E-6
 
-#replace ode45 call with calls from each of the developed methods in the folder
+#try explicit euler test
 T,Y = explicit_euler.euler_adaptive(VanDerPol,0.0,5.0*μ,y0,tol,μ)
 
 
-plot(T,Y[:,1])
+display(plot(T,Y[:,1]))
 
-figure
-plot(T,Y[:,2])
 
-figure
-plot(Y[:,1],Y[:,2])
+display(plot(T,Y[:,2]))
+
+
+display(plot(Y[:,1],Y[:,2]))
 
